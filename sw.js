@@ -4,7 +4,13 @@
 const CACHE = 'wenxue-quiz-v1';
 const KEY = './index.html';
 
-self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('install', (e) => {
+  // 首次访问就先把页面存下来：否则要等 SW 接管后第二次访问才缓存，
+  // 而「考场里第一次打开就没网」正是最需要它的时候
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.add(KEY)).catch(() => {}).then(() => self.skipWaiting())
+  );
+});
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
